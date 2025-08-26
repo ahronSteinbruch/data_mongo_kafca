@@ -8,8 +8,9 @@ class Publisher:
         self.producer = Producer()
     def publish(self):
         data = self.get_data()
-        for key  in data.keys():
-            self.producer.publish_message(key,{'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 'data': data[key]})
+        for key in data.keys():
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            self.producer.publish_message(key,{timestamp:data[key]})
             time.sleep(1)
 
     def get_data(self):

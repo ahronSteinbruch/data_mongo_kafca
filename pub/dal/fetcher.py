@@ -1,4 +1,5 @@
 from sklearn.datasets import fetch_20newsgroups
+
 class DataFetcher():
     def __init__(self):
         self.batch_size = 10
@@ -26,21 +27,45 @@ class DataFetcher():
             'talk.politics.misc',
             'talk.religion.misc',
         ]
-        self.newsgroups_interesting = fetch_20newsgroups(subset='all', categories=self.interesting_categories)
-        self.newsgroups_not_interesting = fetch_20newsgroups(subset='all', categories=self.not_interesting_categories)
+        # Set return_X_y to True to get both data and target labels
+        self.newsgroups_interesting_data, self.newsgroups_interesting_targets = fetch_20newsgroups(
+            subset='all', categories=self.interesting_categories, return_X_y=True)
+        self.newsgroups_not_interesting_data, self.newsgroups_not_interesting_targets = fetch_20newsgroups(
+            subset='all', categories=self.not_interesting_categories, return_X_y=True)
 
-    def batch_generator(self,data, batch_size=None):
+        # Store the category names for mapping
+        self.interesting_category_names = fetch_20newsgroups(subset='all',
+                                                             categories=self.interesting_categories).target_names
+        self.not_interesting_category_names = fetch_20newsgroups(subset='all',
+                                                                 categories=self.not_interesting_categories).target_names
+
+    def batch_generator(self, data, targets, batch_size=None):
         if batch_size is None:
             batch_size = self.batch_size
         for i in range(0, len(data), batch_size):
-            yield data[i:i + batch_size]
+            yield data[i:i + batch_size], targets[i:i + batch_size]
 
     def get_interesting_data(self):
-        data = next(self.batch_generator(self.newsgroups_interesting.data))
-        return data
+        data_batch, target_batch = next(
+            self.batch_generator(self.newsgroups_interesting_data, self.newsgroups_interesting_targets))
+        return self._format_data(data_batch, target_batch, self.interesting_category_names)
+
     def get_not_interesting_data(self):
-        data = next(self.batch_generator(self.newsgroups_not_interesting.data))
-        return data
+        data_batch, target_batch = next(
+            self.batch_generator(self.newsgroups_not_interesting_data, self.newsgroups_not_interesting_targets))
+        return self._format_data(data_batch, target_batch, self.not_interesting_category_names)
+
+    def _format_data(self, data, targets, category_names):
+        """
+        Formats the data into a dictionary with category names as keys and data as values
+        """
+        formatted_data = {}
+        for i, text in enumerate(data):
+            category_name = category_names[targets[i]]
+            if category_name not in formatted_data:
+                formatted_data [category_name] = []
+            formatted_data[category_name].append(text)
+        return formatted_data
 
 
 
