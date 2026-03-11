@@ -1,0 +1,146 @@
+Task: Documentation and Best Practices for Writing Custom Metrics Exporters
+
+Goal
+Create an internal guide that defines how to design, implement, review, and operate custom metrics exporters in our organization. The document should help engineers write exporters that are consistent, maintainable, and safe from common observability problems such as bad naming, wrong units, missing labels, and high cardinality. This is aligned with Prometheus guidance on exporter writing, metric naming, and instrumentation, as well as OpenTelemetry guidance on semantic conventions and metric organization.  ￼
+
+Why this task is needed
+Custom exporters are easy to write incorrectly in ways that later create operational issues. Official Prometheus guidance emphasizes clear metric naming, exporter-specific prefixes, base units, and careful label usage, while OpenTelemetry guidance stresses consistent semantic conventions and structured metric hierarchies. Without internal standards, different teams may expose inconsistent or expensive metrics that are hard to query and maintain.  ￼
+
+Scope
+The task should produce an internal document that covers:
+	•	when to create a custom exporter vs direct instrumentation vs existing exporter reuse
+	•	exporter design principles
+	•	metric naming conventions
+	•	label design rules
+	•	metric type selection
+	•	unit conventions
+	•	cardinality risks and how to avoid them
+	•	security and sensitive data considerations
+	•	performance expectations
+	•	testing and validation requirements
+	•	rollout and ownership expectations
+	•	code examples and a review checklist
+
+Main requirements
+The documentation should include the following sections:
+	1.	When to build a custom exporter
+Define when a team should build a custom exporter and when they should not.
+Examples:
+
+	•	build one when the source system exposes data that Prometheus cannot scrape directly
+	•	do not build one if an official or maintained exporter already exists
+	•	prefer direct application instrumentation when the service code is under our control and business metrics belong in the application itself rather than in a side exporter
+This follows Prometheus exporter guidance around intended exporter usage and clean subsystem ownership.  ￼
+
+	2.	Metric naming standard
+Document naming rules such as:
+
+	•	names must be clear and guessable
+	•	use exporter or subsystem prefix where relevant
+	•	use base units like seconds, bytes, total
+	•	ratios should be exposed as ratios or as the underlying counters, not percentages
+	•	avoid procedurally generated metric names unless there is a justified exporter use case
+These points are directly supported by Prometheus naming and exporter best practices.  ￼
+
+	3.	Label best practices
+Document rules for labels:
+
+	•	labels should describe dimensions that are stable and useful for slicing
+	•	avoid labels with unbounded or near-unbounded values such as user_id, request_id, UUID, full path, timestamp, email, IP if not truly required
+	•	keep label sets consistent for a given metric
+	•	define a policy for required vs optional labels
+	•	document reserved/internal label considerations such as avoiding names beginning with __
+Prometheus data model and client library guidance explicitly warn about label misuse and consistency requirements.  ￼
+
+	4.	Metric type selection
+Define when to use:
+
+	•	Counter for cumulative events
+	•	Gauge for values that go up and down
+	•	Histogram for distributions like latency and size
+	•	Summary only when specifically justified
+Reference Prometheus metric type guidance and internal examples.  ￼
+
+	5.	Semantic conventions and reuse
+Require teams to check whether an existing naming convention already exists before inventing new metric names or attributes. Where relevant, prefer OpenTelemetry semantic conventions so naming is consistent across services and signals.  ￼
+	6.	Performance and safety rules
+Document operational expectations:
+
+	•	exporter endpoint must respond reliably and fast enough for scrape intervals
+	•	collection logic must not create heavy load on the target system
+	•	expensive external calls should be controlled or cached where needed
+	•	exporter must fail gracefully and expose enough self-observability to debug issues
+	•	no sensitive data should be exposed in metric names or labels
+This is consistent with Prometheus instrumentation/exporter philosophy and general observability hygiene.  ￼
+
+	7.	Validation and testing
+Document how an exporter is validated before production:
+
+	•	metric naming review
+	•	label cardinality review
+	•	unit review
+	•	/metrics output validation
+	•	scrape test from Prometheus or collector
+	•	sample PromQL queries
+	•	dashboard/alert examples
+	•	failure mode test
+	•	load/cost sanity check
+OpenMetrics and Prometheus conventions support stable, consistent exposition.  ￼
+
+	8.	Definition of done for any future exporter
+Add a reusable checklist:
+
+	•	design reviewed
+	•	metrics and labels reviewed
+	•	naming follows standard
+	•	example queries included
+	•	dashboard and alert examples included
+	•	owner and support contact defined
+	•	runbook linked
+	•	tested in non-production
+	•	approved by observability team
+
+Expected deliverables
+	1.	One internal best-practices document for writing custom metrics exporters
+	2.	One exporter template/example in the preferred language used by the team
+	3.	One review checklist for PRs and design reviews
+	4.	One “bad vs good metrics” section with examples from real-world anti-patterns
+	5.	One short onboarding page: “How to request approval for a new custom exporter”
+
+Suggested structure of the document
+	•	Purpose
+	•	When to use a custom exporter
+	•	Architecture options
+	•	Naming conventions
+	•	Labels and cardinality
+	•	Metric types and units
+	•	Semantic convention reuse
+	•	Security and privacy
+	•	Performance expectations
+	•	Testing requirements
+	•	Deployment and ownership
+	•	PR checklist
+	•	Good and bad examples
+	•	Appendix with code snippet/template
+
+Acceptance criteria
+	•	the document is published in the team knowledge base
+	•	it contains at least 10 concrete rules with examples
+	•	it includes at least 1 approved sample exporter implementation
+	•	it includes a checklist that can be reused in future PRs
+	•	it defines explicit anti-patterns to reject
+	•	it is reviewed by observability stakeholders
+	•	it is usable by an engineer without prior exporter experience
+
+Nice-to-have
+	•	include sample naming conventions for infrastructure, business, and integration metrics
+	•	include a cardinality scoring model
+	•	include sample alerts for exporter health like up, scrape failures, and exporter-specific error counters
+	•	include a migration guide for fixing legacy exporters
+
+Task owner output
+The assignee should finish with:
+	•	a complete document
+	•	a sample implementation
+	•	a review checklist
+	•	a short presentation or summary to the team
