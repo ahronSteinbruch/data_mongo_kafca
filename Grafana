@@ -1,0 +1,43 @@
+Evaluate “Organization as a Service” in Grafana Enterprise
+
+Task goal
+
+Evaluate the option of providing Grafana Organization as a Service through our internal platform America.
+
+In this model, a client uses America to create a new Grafana organization, and from that point can manage their own space independently: add users, grant access, create dashboards, folders, alerts, teams, and manage their own day-to-day Grafana usage within the boundaries we define.
+
+The purpose of this task is not to implement the solution yet, but to produce a clear evaluation of whether this is the right operating model for us.
+
+What you need to examine
+
+You need to analyze this service model from a platform point of view and explain:
+	•	what are the main advantages of giving customers their own Grafana organization through America
+	•	what are the main disadvantages
+	•	what are the limitations of this model
+	•	what stays under platform team responsibility even if the customer gets their own organization
+	•	what the customer can truly manage alone, and what they still cannot do
+	•	what are the operational, governance, security, and scale risks
+	•	in which cases this model is a good fit, and in which cases it is not
+
+Main questions this task must answer
+
+Your output should give clear answers to the following:
+	1.	What do we gain by giving each client their own Grafana organization?
+	2.	What problems can this create for us as the platform owner?
+	3.	Does this model create real isolation, or only partial isolation?
+	4.	What dependencies on the central platform team still remain?
+	5.	What can become difficult when the number of organizations grows?
+	6.	What governance rules would likely be needed for this to work well?
+	7.	What are the main reasons to choose this model, and what are the main reasons not to?
+
+Scope
+
+Focus specifically on the model of:
+	•	one shared Grafana Enterprise platform
+	•	multiple client organizations
+	•	self-service org creation through America
+	•	customers managing their own organization after creation
+
+Do not go deep into alternative architectures such as full dedicated Grafana per customer, unless it is needed briefly for comparison.
+
+Do not design the full implementation in this task.
